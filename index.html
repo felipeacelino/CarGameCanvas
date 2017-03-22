@@ -3,24 +3,27 @@
 <head lang="en">
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
 	<title>Cars</title>
 	
-	<style type="text/css" media="screen">
-		.container {			
-			width: 300px;
-			margin: 0 auto;
-		}
-		#canvas {
-			border: 1px solid #333;
-		}
-	</style>
+	<link rel="stylesheet" type="text/css" href="style.css">
 
 </head>
 <body>
 
-<div class="container">
-	<span id="score">0</span>
-	<canvas id="canvas" width="260" height="420">	
+<div class="container">	
+	<div class="placar">
+		<div class="score">
+			<label>Score</label>
+			<span id="score">0</span>
+		</div>
+		<div class="highscore">
+			<label>Highscore</label>
+			<span id="bestscore">0</span>
+		</div>
+	</div>
+	<canvas id="canvas" width="220" height="300">	
+	
 </div>
 
 </canvas>
@@ -42,12 +45,29 @@
 		update: function() {
 			this.value++;
 			this.ele.innerHTML = this.value;
+		},
+		reset: function() {
+			this.value = 0;
+			this.ele.innerHTML = this.value;
+		}
+	}
+
+	var bestScore = {
+		value: window.localStorage.getItem('bestscore') != null ? window.localStorage.getItem('bestscore') : 0,
+		ele: document.querySelector('#bestscore'),
+		init: function() {
+			this.ele.innerHTML = this.value;
+		},
+		update: function(val) {
+			this.value = val;
+			window.localStorage.setItem('bestscore', this.value);
+			this.ele.innerHTML = this.value;
 		}
 	}
 
 	var states = {
-		playing: 1,
-		paused: 2,
+		start: 1,
+		playing: 2,
 		loser: 3
 	}
 
@@ -87,18 +107,18 @@
  	// Enemies
  	var enemies = {
  		cars: [],
- 		posicoes: [40, 140],
+ 		posicoes: [40, 120],
  		x: 40,
- 		y: -100,
- 		width: 80,
- 		height: 100,
+ 		y: -80,
+ 		width: 60,
+ 		height: 80,
  		delayInsert: 0,
  		insert: function() {
  			this.cars.push({
  				x: this.posicoes[Math.floor(Math.random() * 2)],
  				y: this.y
  			});
- 			this.delayInsert = Math.round(130 / speed);
+ 			this.delayInsert = Math.round(105 / speed);
  		},
  		draw: function() {
  			for (var i = 0; i < this.cars.length; i++) {
@@ -120,8 +140,11 @@
 
  				if (enemi.x == car.x && (enemi.y + this.height) >= car.y && enemi.y <= (car.y + car.height)) {
 
- 					console.log('COLIDIU!');
  					status = states.loser;
+
+ 					if (score.value > bestScore.value) {
+ 						bestScore.update(score.value);
+ 					}
 
  				} else if (enemi.y >= canvasHeight) {
  					this.cars.splice(i,1);
@@ -140,9 +163,9 @@
  	// Car
  	var car = {
  		x: 40,
- 		y: (canvasHeight-120),
- 		width: 80,
- 		height: 100,
+ 		y: (canvasHeight-100),
+ 		width: 60,
+ 		height: 80,
  		draw: function() {
  			ctx.strokeStyle = '#000';
  			ctx.strokeRect(this.x, this.y, this.width, this.height);
@@ -153,18 +176,33 @@
  		if (status == states.playing) {
  			// Car Right
 	 		if (e.keyCode == 39) {
-	 			car.x = 140;
+	 			car.x = 120;
 	 		} 
 	 		// Car Lefts
 	 		else if (e.keyCode == 37) {
 	 			car.x = 40;
 	 		}
- 		} 		
+ 		} else if (status == states.start) {
+ 			// Start Game
+	 		if (e.keyCode == 32) {
+	 			status = states.playing;
+	 		}
+ 		} else if (status == states.loser) {
+ 			// Restart Game
+	 		if (e.keyCode == 32) {
+	 			score.reset();
+	 			speed = 1;
+	 			car.x = 40;
+	 			status = states.playing;
+	 		}
+ 		}
+
+ 				
  	}
 
  	function draw() {
  		background.draw();
- 		grids.draw();
+ 		//grids.draw();
  		car.draw();
  		if (status == states.playing) {
 	 		enemies.draw();	 		
@@ -173,6 +211,7 @@
 
  	function update() {
  		if (status == states.playing) {
+
  			enemies.update();
 
  			if (score.value > 5 && score.value < 15) {
@@ -197,7 +236,8 @@
  	function init() {	
 
 		document.addEventListener('keydown', keypress);
-		status = states.playing;
+		bestScore.init();
+		status = states.start;
 
 		run();
 
