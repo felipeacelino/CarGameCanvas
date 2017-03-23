@@ -239,14 +239,24 @@ function update() {
 		enemies.update();
 
 		// Update levels
-		if (score.value > 5 && score.value <= 10) {
+		if (score.value > 5 && score.value <= 15) {
 			speed = 2;
-		} else if (score.value > 10 && score.value <= 15) {
+		} else if (score.value > 15 && score.value <= 25) {
 			speed = 3;
-		} else if (score.value > 15 && score.value <= 20) {
+		} else if (score.value > 25 && score.value <= 35) {
 			speed = 4;
-		} else if (score.value > 20) {
+		} else if (score.value > 35 && score.value <= 55) {
 			speed = 5;
+		} else if (score.value > 55 && score.value <= 75) {
+			speed = 6;
+		} else if (score.value > 75 && score.value <= 95) {
+			speed = 7;
+		} else if (score.value > 95 && score.value <= 115) {
+			speed = 8;
+		} else if (score.value > 115 && score.value <= 135) {
+			speed = 9;
+		} else if (score.value > 135) {
+			speed = 10;
 		} else {
 			speed = 1;
 		}
