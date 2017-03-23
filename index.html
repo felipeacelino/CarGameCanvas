@@ -6,12 +6,15 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
 	<title>Cars</title>
 	
+	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 	<link rel="stylesheet" type="text/css" href="style.css">
 
+	<script type="text/javascript" src="sprite.js"></script>
 </head>
 <body>
 
 <div class="container">	
+
 	<div class="placar">
 		<div class="score">
 			<label>Score</label>
@@ -22,16 +25,26 @@
 			<span id="bestscore">0</span>
 		</div>
 	</div>
-	<canvas id="canvas" width="220" height="300">	
+
+	<canvas id="canvas" width="220" height="350">
+	</canvas>
+
+	<div class="btns">
+		
+		<button class="btn left"><i class="fa fa-play fa-flip-horizontal" aria-hidden="true"></i></button>
+		<button id="btn-start">Start</button>		
+		<button class="btn right"><i class="fa fa-play" aria-hidden="true"></i></button>
+
+	</div>
 	
 </div>
 
-</canvas>
+
 
 <script type="text/javascript">
 	
  	
- 	var canvas, ctx, speed = 1, canvasWidth, canvasHeight, status;
+ 	var canvas, ctx, speed = 1, canvasWidth, canvasHeight, status, img;
 
  	canvas = document.querySelector('#canvas');
 	ctx = canvas.getContext('2d');
@@ -79,8 +92,9 @@
  		height: canvasHeight,
  		draw: function() {
  			//ctx.fillStyle = '#ACC7BB';
- 			ctx.fillStyle = '#FFF';
- 			ctx.fillRect(this.x, this.y, this.width, this.height);
+ 			//ctx.fillStyle = '#444040';
+ 			//ctx.fillRect(this.x, this.y, this.width, this.height);
+ 			street.draw(this.x, this.y);
  		}
  	}
 
@@ -107,14 +121,16 @@
  	// Enemies
  	var enemies = {
  		cars: [],
- 		posicoes: [40, 120],
- 		x: 40,
+ 		posicoes: [60, 120],
+ 		models: [car1, car2, car3],
+ 		x: 60,
  		y: -80,
- 		width: 60,
+ 		width: 40,
  		height: 80,
  		delayInsert: 0,
  		insert: function() {
  			this.cars.push({
+ 				model: this.models[Math.floor(Math.random() * 3)],
  				x: this.posicoes[Math.floor(Math.random() * 2)],
  				y: this.y
  			});
@@ -123,8 +139,9 @@
  		draw: function() {
  			for (var i = 0; i < this.cars.length; i++) {
  				this.cars[i].y += speed;
- 				ctx.strokeStyle = '#000';
-				ctx.strokeRect(this.cars[i].x, this.cars[i].y, this.width, this.height);
+ 				/*ctx.strokeStyle = '#000';
+				ctx.strokeRect(this.cars[i].x, this.cars[i].y, this.width, this.height);*/
+				this.cars[i].model.draw(this.cars[i].x, this.cars[i].y);
 			}			
  		},
  		update: function() { 			
@@ -162,13 +179,14 @@
 
  	// Car
  	var car = {
- 		x: 40,
+ 		x: 60,
  		y: (canvasHeight-100),
- 		width: 60,
+ 		width: 40,
  		height: 80,
  		draw: function() {
- 			ctx.strokeStyle = '#000';
- 			ctx.strokeRect(this.x, this.y, this.width, this.height);
+ 			/*ctx.strokeStyle = '#000';
+ 			ctx.strokeRect(this.x, this.y, this.width, this.height);*/
+ 			car1.draw(this.x, this.y);
  		}
  	}
 
@@ -180,7 +198,7 @@
 	 		} 
 	 		// Car Lefts
 	 		else if (e.keyCode == 37) {
-	 			car.x = 40;
+	 			car.x = 60;
 	 		}
  		} else if (status == states.start) {
  			// Start Game
@@ -192,7 +210,7 @@
 	 		if (e.keyCode == 32) {
 	 			score.reset();
 	 			speed = 1;
-	 			car.x = 40;
+	 			car.x = 60;
 	 			status = states.playing;
 	 		}
  		}
@@ -201,12 +219,14 @@
  	}
 
  	function draw() {
+
  		background.draw();
  		//grids.draw();
  		car.draw();
  		if (status == states.playing) {
 	 		enemies.draw();	 		
  		}
+
  	}
 
  	function update() {
@@ -214,13 +234,13 @@
 
  			enemies.update();
 
- 			if (score.value > 5 && score.value < 15) {
+ 			/*if (score.value > 5 && score.value < 15) {
  				speed = 2;
  			} else if (score.value >= 15 && score.value < 30) {
  				speed = 3;
  			} else if (score.value >= 30) {
  				speed = 4;
- 			}
+ 			}*/
 
  		} else if (status == states.loser) {
  			enemies.clear();
@@ -238,6 +258,9 @@
 		document.addEventListener('keydown', keypress);
 		bestScore.init();
 		status = states.start;
+
+		img = new Image();
+		img.src = "sheet.png";
 
 		run();
 
