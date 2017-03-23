@@ -6,6 +6,7 @@ speed,        // Game speed
 status,       // Game status
 carModels,    // Cars models array
 img,          // Sprite image
+img2,         // Sprite image 2
 streetBg,     // Street background
 car1,         // Car model 1
 car2,         // Car model 2
@@ -59,6 +60,17 @@ car = {
 		car1.draw(this.x, this.y);
 	}
 },
+// Explosion
+explosion = {
+	frameActive: 0,
+	frames: [],
+	draw: function() {	
+		this.frames[this.frameActive].draw(car.x - 43, car.y - 40);
+		if (this.frameActive < 11) {
+			this.frameActive++;
+		}	
+	}
+}
 // Enemies
 enemies = {
 	cars: [],
@@ -129,13 +141,14 @@ grids = {
 };
 
 // Sprite Class
-function Sprite(x, y, width, height) {
+function Sprite(img, x, y, width, height) {
+	this.img = img;
 	this.x = x;
 	this.y = y;
 	this.width = width;
 	this.height = height;
 	this.draw = function(xCanvas, yCanvas) {
-		ctx.drawImage(img, this.x, this.y, this.width, this.height, xCanvas, yCanvas, this.width, this.height);
+		ctx.drawImage(this.img, this.x, this.y, this.width, this.height, xCanvas, yCanvas, this.width, this.height);
 	}
 }
 
@@ -161,6 +174,7 @@ function keypress(e) {
 	// Restart Game
 	else if (status == states.loser) { 			
 		if (e.keyCode == 32) {
+			explosion.frameActive = 0;
 			gameOver.style.display = "none";
 			enemies.clear();
 			score.reset();
@@ -172,8 +186,6 @@ function keypress(e) {
 
 // Buttons events
 function buttonsEvents(e) {
-
-	//console.log(e.target.dataset.action);
 
 	var action = e.target.dataset.action;
 	
@@ -197,6 +209,7 @@ function buttonsEvents(e) {
 	// Restart Game
 	else if (status == states.loser) {		
  		if (action == 'start') {
+ 			explosion.frameActive = 0;
  			gameOver.style.display = "none";
  			enemies.clear();
  			score.reset();
@@ -211,7 +224,10 @@ function buttonsEvents(e) {
 function draw() {
 	street.draw(); 		
 	car.draw();
-	enemies.draw();	 
+	enemies.draw();		
+	if (status == states.loser) {	
+		explosion.draw();	
+	} 		 	
 	//grids.draw();
 }
 
@@ -235,7 +251,7 @@ function update() {
 			speed = 1;
 		}
 
-	} else if (status == states.loser) {
+	} else if (status == states.loser) {	
 		gameOver.style.display = "inline-block";
 		if (score.value > highscore.value) {
 			highscore.update(score.value);
@@ -274,12 +290,30 @@ function init() {
 
 	// Sprites
 	img = new Image();
+	img2 = new Image();
 	img.src = "sheet.png";
-	streetBg = new Sprite(70, 0, 219, 360);
-	car1 = new Sprite(0, 0, 40, 81);
-	car2 = new Sprite(0, 81, 40, 83);
-	car3 = new Sprite(0, 164, 40, 83);
+	img2.src = "explosion.png";
+	streetBg = new Sprite(img, 70, 0, 219, 360);
+	car1 = new Sprite(img, 0, 0, 40, 81);
+	car2 = new Sprite(img, 0, 81, 40, 83);
+	car3 = new Sprite(img, 0, 164, 40, 83);
 	carModels = [car1, car2, car3];
+	// Explosion sprites frames
+	explosion.frames.push(new Sprite(img2, 0, 0, 127, 124));	
+	explosion.frames.push(new Sprite(img2, 0, 0, 127, 124));
+	explosion.frames.push(new Sprite(img2, 130, 0, 118, 124));
+	explosion.frames.push(new Sprite(img2, 251, 0, 127, 124));
+	explosion.frames.push(new Sprite(img2, 381, 0, 127, 124));
+	explosion.frames.push(new Sprite(img2, 0, 127, 127, 134));
+	explosion.frames.push(new Sprite(img2, 130, 127, 118, 134));
+	explosion.frames.push(new Sprite(img2, 251, 127, 127, 134));
+	explosion.frames.push(new Sprite(img2, 381, 127, 127, 134));
+	explosion.frames.push(new Sprite(img2, 0, 264, 127, 128));
+	explosion.frames.push(new Sprite(img2, 130, 264, 118, 128));
+	explosion.frames.push(new Sprite(img2, 251, 264, 127, 128));
+	explosion.frames.push(new Sprite(img2, 381, 264, 127, 128));
+	explosion.frames.push(new Sprite(img2, 0, 395, 127, 130));
+	explosion.frames.push(new Sprite(img2, 130, 395, 118, 130));
 
 	run();
 
