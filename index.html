@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head lang="en">
+
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
@@ -9,7 +10,6 @@
 	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 	<link rel="stylesheet" type="text/css" href="style.css">
 
-	<script type="text/javascript" src="sprite.js"></script>
 </head>
 <body>
 
@@ -22,253 +22,28 @@
 		</div>
 		<div class="highscore">
 			<label>Highscore</label>
-			<span id="bestscore">0</span>
+			<span id="highscore">0</span>
 		</div>
 	</div>
 
-	<canvas id="canvas" width="220" height="350">
+	<div class="game-over">
+		Game Over
+	</div>
+
+	<canvas id="canvas" width="220" height="360">
 	</canvas>
 
 	<div class="btns">
 		
-		<button class="btn left"><i class="fa fa-play fa-flip-horizontal" aria-hidden="true"></i></button>
-		<button id="btn-start">Start</button>		
-		<button class="btn right"><i class="fa fa-play" aria-hidden="true"></i></button>
+		<i class="btn left fa fa-play-circle fa-flip-horizontal" data-action="car-left" aria-hidden="true"></i>
+		<button id="btn-start" data-action="start">Start</button>
+		<i class="btn right fa fa-play-circle" data-action="car-right" aria-hidden="true"></i>
 
 	</div>
 	
 </div>
 
-
-
-<script type="text/javascript">
-	
- 	
- 	var canvas, ctx, speed = 1, canvasWidth, canvasHeight, status, img;
-
- 	canvas = document.querySelector('#canvas');
-	ctx = canvas.getContext('2d');
-
-	canvasWidth = canvas.width;
-	canvasHeight = canvas.height;
-
-	var score = {
-		value: 0,
-		ele: document.querySelector('#score'),
-		update: function() {
-			this.value++;
-			this.ele.innerHTML = this.value;
-		},
-		reset: function() {
-			this.value = 0;
-			this.ele.innerHTML = this.value;
-		}
-	}
-
-	var bestScore = {
-		value: window.localStorage.getItem('bestscore') != null ? window.localStorage.getItem('bestscore') : 0,
-		ele: document.querySelector('#bestscore'),
-		init: function() {
-			this.ele.innerHTML = this.value;
-		},
-		update: function(val) {
-			this.value = val;
-			window.localStorage.setItem('bestscore', this.value);
-			this.ele.innerHTML = this.value;
-		}
-	}
-
-	var states = {
-		start: 1,
-		playing: 2,
-		loser: 3
-	}
-
- 	// Background
- 	var background = {
- 		x: 0,
- 		y: 0,
- 		width: canvasWidth,
- 		height: canvasHeight,
- 		draw: function() {
- 			//ctx.fillStyle = '#ACC7BB';
- 			//ctx.fillStyle = '#444040';
- 			//ctx.fillRect(this.x, this.y, this.width, this.height);
- 			street.draw(this.x, this.y);
- 		}
- 	}
-
- 	// Grids
- 	var grids = {
- 		x: 0,
- 		y: 0,
- 		width: 20,
- 		height: 20,
- 		draw: function() {
- 			ctx.strokeStyle = '#CCC';
- 			var x,y = 0;
- 			for (var i = 0; i < (canvasHeight / this.height); i++) {	
- 				x = 0;
-	 			for (var j = 0; j < (canvasWidth / this.width); j++) {
-	 				ctx.strokeRect(x, y, this.width, this.height);
-	 				x += this.width;
-	 			} 			 		
- 				y += this.height;
- 			}	
- 		}
- 	}
-
- 	// Enemies
- 	var enemies = {
- 		cars: [],
- 		posicoes: [60, 120],
- 		models: [car1, car2, car3],
- 		x: 60,
- 		y: -80,
- 		width: 40,
- 		height: 80,
- 		delayInsert: 0,
- 		insert: function() {
- 			this.cars.push({
- 				model: this.models[Math.floor(Math.random() * 3)],
- 				x: this.posicoes[Math.floor(Math.random() * 2)],
- 				y: this.y
- 			});
- 			this.delayInsert = Math.round(105 / speed);
- 		},
- 		draw: function() {
- 			for (var i = 0; i < this.cars.length; i++) {
- 				this.cars[i].y += speed;
- 				/*ctx.strokeStyle = '#000';
-				ctx.strokeRect(this.cars[i].x, this.cars[i].y, this.width, this.height);*/
-				this.cars[i].model.draw(this.cars[i].x, this.cars[i].y);
-			}			
- 		},
- 		update: function() { 			
- 			if (this.delayInsert == 0) {
- 				this.insert();
- 			} else {
- 				this.delayInsert--;
- 			}
- 			for (var i = 0, tam = this.cars.length; i < tam; i++) {
-
- 				var enemi = this.cars[i];
- 				enemi.y += speed;
-
- 				if (enemi.x == car.x && (enemi.y + this.height) >= car.y && enemi.y <= (car.y + car.height)) {
-
- 					status = states.loser;
-
- 					if (score.value > bestScore.value) {
- 						bestScore.update(score.value);
- 					}
-
- 				} else if (enemi.y >= canvasHeight) {
- 					this.cars.splice(i,1);
- 					tam--;
- 					i--;
- 					score.update();
- 				}
-
-			}
- 		},
- 		clear: function() {
- 			this.cars = [];
- 		}
- 	}
-
- 	// Car
- 	var car = {
- 		x: 60,
- 		y: (canvasHeight-100),
- 		width: 40,
- 		height: 80,
- 		draw: function() {
- 			/*ctx.strokeStyle = '#000';
- 			ctx.strokeRect(this.x, this.y, this.width, this.height);*/
- 			car1.draw(this.x, this.y);
- 		}
- 	}
-
- 	function keypress(e) {
- 		if (status == states.playing) {
- 			// Car Right
-	 		if (e.keyCode == 39) {
-	 			car.x = 120;
-	 		} 
-	 		// Car Lefts
-	 		else if (e.keyCode == 37) {
-	 			car.x = 60;
-	 		}
- 		} else if (status == states.start) {
- 			// Start Game
-	 		if (e.keyCode == 32) {
-	 			status = states.playing;
-	 		}
- 		} else if (status == states.loser) {
- 			// Restart Game
-	 		if (e.keyCode == 32) {
-	 			score.reset();
-	 			speed = 1;
-	 			car.x = 60;
-	 			status = states.playing;
-	 		}
- 		}
-
- 				
- 	}
-
- 	function draw() {
-
- 		background.draw();
- 		//grids.draw();
- 		car.draw();
- 		if (status == states.playing) {
-	 		enemies.draw();	 		
- 		}
-
- 	}
-
- 	function update() {
- 		if (status == states.playing) {
-
- 			enemies.update();
-
- 			/*if (score.value > 5 && score.value < 15) {
- 				speed = 2;
- 			} else if (score.value >= 15 && score.value < 30) {
- 				speed = 3;
- 			} else if (score.value >= 30) {
- 				speed = 4;
- 			}*/
-
- 		} else if (status == states.loser) {
- 			enemies.clear();
- 		} 		
- 	}
-
- 	function run() {
-    	update();
-		draw();
-    	window.requestAnimationFrame(run);
- 	}
-
- 	function init() {	
-
-		document.addEventListener('keydown', keypress);
-		bestScore.init();
-		status = states.start;
-
-		img = new Image();
-		img.src = "sheet.png";
-
-		run();
-
- 	}
-
- 	init(); 	
-
-</script>
+<script type="text/javascript" src="script.js"></script>
 	
 </body>
 </html>
