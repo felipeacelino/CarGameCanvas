@@ -178,7 +178,7 @@ function keypress(e) {
 			gameOver.style.display = "none";
 			enemies.clear();
 			score.reset();
-			speed = 1;	 			
+			speed = 2;	 			
 			status = states.playing;
 		}
 	} 				
@@ -213,7 +213,7 @@ function buttonsEvents(e) {
  			gameOver.style.display = "none";
  			enemies.clear();
  			score.reset();
- 			speed = 1;
+ 			speed = 2;
  			car.x = 60;
  			status = states.playing;
  		}
@@ -240,25 +240,23 @@ function update() {
 
 		// Update levels
 		if (score.value > 5 && score.value <= 15) {
-			speed = 2;
-		} else if (score.value > 15 && score.value <= 25) {
 			speed = 3;
-		} else if (score.value > 25 && score.value <= 35) {
+		} else if (score.value > 15 && score.value <= 25) {
 			speed = 4;
-		} else if (score.value > 35 && score.value <= 55) {
+		} else if (score.value > 25 && score.value <= 35) {
 			speed = 5;
-		} else if (score.value > 55 && score.value <= 75) {
+		} else if (score.value > 35 && score.value <= 55) {
 			speed = 6;
-		} else if (score.value > 75 && score.value <= 95) {
+		} else if (score.value > 55 && score.value <= 75) {
 			speed = 7;
-		} else if (score.value > 95 && score.value <= 115) {
+		} else if (score.value > 75 && score.value <= 95) {
 			speed = 8;
-		} else if (score.value > 115 && score.value <= 135) {
+		} else if (score.value > 95 && score.value <= 115) {
 			speed = 9;
-		} else if (score.value > 135) {
+		} else if (score.value > 115) {
 			speed = 10;
 		} else {
-			speed = 1;
+			speed = 2;
 		}
 
 	} else if (status == states.loser) {	
@@ -295,7 +293,7 @@ function init() {
 
 	// Setup Game	
 	highscore.init();
-	speed = 1;
+	speed = 2;
 	status = states.start;		
 
 	// Sprites
